@@ -84,9 +84,15 @@ prop_maxel_realm =
 
 prop_pixel_mul_transpose :: Property
 prop_pixel_mul_transpose =
-  label "transpose (a *? b) == (*?) <$> transpose a <*> transpose b" .
+  label "(a b)^t = a^t b^t" .
     forAll (arbitrary @(Pixel Int, Pixel Int)) $ \(a, b) ->
-      (P.transpose <$> a P.*? b) == P.transpose b P.*? P.transpose a
+      (P.transpose <$> a P.*? b) === P.transpose b P.*? P.transpose a
+
+prop_pixel_mul_associativity :: Property
+prop_pixel_mul_associativity =
+  label "a (b c) = (a b) c" .
+    forAll (arbitrary @(Pixel Int, Pixel Int, Pixel Int)) $ \(a, b, c) ->
+      (a P.*? b >>= (P.*? c)) === ((a P.*?) =<< b P.*? c)
 
 return []
 
