@@ -100,6 +100,12 @@ prop_maxel_multiplication =
     forAll (arbitrary @(Maxel Int, Maxel Int, Maxel Int)) $ \(a, b, c) ->
       a M.<.> (b M.<.> c) === (a M.<.> b) M.<.> c
 
+prop_diagonal_idempotent :: Property
+prop_diagonal_idempotent =
+  label "singleton diagonals are idempotent" .
+    forAll (arbitrary @Int) $ \n ->
+      M.singleIdempotent n M.<.> M.singleIdempotent n === M.singleIdempotent n
+
 return []
 
 tests :: IO Bool

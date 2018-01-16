@@ -1,5 +1,6 @@
 module Data.Maxel where
 
+import           Control.Monad
 import           Data.Foldable
 import           Data.Maybe
 import qualified Data.MultiSet as S
@@ -7,6 +8,7 @@ import qualified Data.Pixel as P
 import           Data.Pixel (Pixel(..))
 import           Data.Realm
 import           Data.Set (Set)
+import qualified Data.Set as Set
 import           Numeric.Natural
 
 newtype Maxel a = Maxel { unMaxel :: S.MultiSet (Pixel a) }
@@ -100,4 +102,12 @@ fromFrame (Frame f) = fromSet f
 -- | The cross of m is all the rows and columns in m
 cross :: Ord a => Maxel a -> Pixel (Set a)
 cross (Maxel m) = Pixel (S.toSet $ S.map row m) (S.toSet $ S.map column m)
+
+-- | An idempotent maxel which is a diagonal singleton [[i,i]]
+singleIdempotent :: Ord a => a -> Maxel a
+singleIdempotent = join singleton
+
+-- | A partial identity maxel has one-pixels on the diagonal
+partialIdentity :: Ord a => Set a -> Maxel a
+partialIdentity s = Maxel . S.fromSet $ P.diagonal `Set.map` s
 
