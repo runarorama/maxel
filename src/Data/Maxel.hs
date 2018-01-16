@@ -47,8 +47,13 @@ empty = fromList []
 null :: Maxel a -> Bool
 null (Maxel s) = S.null s
 
+-- | Get the pixels in a maxel as a list
 pixels :: Maxel a -> [Pixel a]
 pixels (Maxel s) = S.elems s
+
+-- | Scale a maxel by a natural number n, by scaling the multiplicities.
+scale :: Natural -> Maxel a -> Maxel a
+scale n = fold . replicate n
 
 instance Ord a => Realm (Maxel a) where
   (Maxel p) \/ (Maxel q) = Maxel (p `S.maxUnion` q)
