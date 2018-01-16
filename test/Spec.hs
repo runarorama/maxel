@@ -50,6 +50,10 @@ prop_row_col =
 prop_empty_null :: Property
 prop_empty_null = property . assert . M.null $ M.empty @Int
 
+-- The empty maxel has size 0
+prop_empty_zero :: Property
+prop_empty_zero = property . assert . (== 0) . M.size $ M.empty @Int
+
 tests :: IO Bool
 tests = checkParallel $$(discover)
 

@@ -1,0 +1,72 @@
+module Data.Realm where
+
+-- | A realm is a monoid and a distributive semilattice, satisfying the following:
+--
+-- Commutative laws
+--
+-- @
+-- m <> n ≡ n <> m
+-- m \/ n ≡ n \/ m
+-- m /\ n ≡ n /\ m
+-- @
+--
+-- Associative laws
+--
+-- @
+-- k <> (m <> n) ≡ (k <> m) <> n
+-- k \/ (m \/ n) ≡ (k \/ m) \/ n
+-- k /\ (m /\ n) ≡ (k /\ m) /\ n
+-- @
+--
+-- Distributive laws
+--
+-- @
+-- k <> (m \/ n) ≡ (k <> m) \/ (k <> n)
+-- k <> (m /\ n) ≡ (k <> m) /\ (k <> n)
+-- k /\ (m \/ n) ≡ (k /\ m) \/ (k /\ n)
+-- k \/ (m /\ n) ≡ (k \/ m) /\ (k \/ n)
+-- @
+--
+-- Identity laws
+--
+-- @
+-- mempty <> m ≡ m
+-- mempty \/ m ≡ m
+-- mempty /\ m ≡ mempty
+-- @
+--
+-- Absorption laws
+--
+-- @
+-- m \/ (m /\ n) ≡ m
+-- m /\ (m \/ n) ≡ m
+-- @
+--
+-- Idempotent laws
+--
+-- @
+-- m \/ m ≡ m
+-- m /\ m ≡ m
+-- @
+--
+-- Summation law
+--
+-- @
+-- (m \/ n) <> (m /\ n) ≡ m <> n
+-- @
+--
+-- Cancellation law
+--
+-- @
+-- (k <> n = m <> n) => (k = m)
+-- @
+--
+-- This is a subclass of `Ord` because any join semilattice defines an order
+--
+-- @
+-- m <= n = m \/ n == n
+-- @
+class (Ord a, Monoid a) => Realm a where
+  (\/) :: a -> a -> a
+  (/\) :: a -> a -> a
+

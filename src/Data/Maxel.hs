@@ -2,11 +2,12 @@ module Data.Maxel where
 
 import qualified Data.MultiSet as S
 import qualified Data.Pixel as P
-import Data.Pixel (Pixel(..))
+import           Data.Pixel (Pixel(..))
+import           Data.Realm
 import           Numeric.Natural
 
 newtype Maxel a = Maxel { unMaxel :: S.MultiSet (Pixel a) }
-  deriving (Eq, Ord, Show)
+  deriving Show
 
 fromList :: Ord a => [Pixel a] -> Maxel a
 fromList ps = Maxel (S.fromList ps)
@@ -44,4 +45,16 @@ empty = fromList []
 null :: Maxel a -> Bool
 null (Maxel s) = S.null s
 
+instance Ord a => Realm (Maxel a) where
+  (Maxel p) \/ (Maxel q) = Maxel (p `S.maxUnion` q)
+  (Maxel p) /\ (Maxel q) = Maxel (p `S.intersection` q)
 
+instance Ord a => Ord (Maxel a) where
+  m <= n = m \/ n == n
+
+instance Ord a => Eq (Maxel a) where
+  m == n = m <= n && m >= n
+
+instance Ord a => Monoid (Maxel a) where
+  mappend (Maxel p) (Maxel q) = Maxel (p `S.union` q)
+  mempty = empty
