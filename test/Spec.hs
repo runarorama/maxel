@@ -94,6 +94,12 @@ prop_pixel_mul_associativity =
     forAll (arbitrary @(Pixel Int, Pixel Int, Pixel Int)) $ \(a, b, c) ->
       (a P.*? b >>= (P.*? c)) === ((a P.*?) =<< b P.*? c)
 
+prop_maxel_multiplication :: Property
+prop_maxel_multiplication =
+  label "associative law" .
+    forAll (arbitrary @(Maxel Int, Maxel Int, Maxel Int)) $ \(a, b, c) ->
+      a M.<.> (b M.<.> c) === (a M.<.> b) M.<.> c
+
 return []
 
 tests :: IO Bool

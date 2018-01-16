@@ -1,6 +1,7 @@
 module Data.Maxel where
 
 import           Data.Foldable
+import           Data.Maybe
 import qualified Data.MultiSet as S
 import qualified Data.Pixel as P
 import           Data.Pixel (Pixel(..))
@@ -69,4 +70,11 @@ instance Eq a => Eq (Maxel a) where
 instance Ord a => Monoid (Maxel a) where
   mappend (Maxel p) (Maxel q) = Maxel (p `S.union` q)
   mempty = empty
+
+-- | Maxel multiplication
+(<.>) :: Ord a => Maxel a -> Maxel a -> Maxel a
+Maxel a <.> Maxel b = Maxel $
+  S.bind a $ \x ->
+  S.bind b $ \y ->
+    maybe S.empty S.singleton (x P.*? y)
 
