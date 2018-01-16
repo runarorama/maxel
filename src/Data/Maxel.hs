@@ -89,3 +89,11 @@ Maxel a <.> Maxel b = Maxel $
 support :: Maxel a -> Frame a
 support (Maxel a) = Frame $ S.toSet a
 
+-- | The free maxel on a set of pixels
+fromSet :: Set (Pixel a) -> Maxel a
+fromSet s = Maxel (S.fromSet s)
+
+-- | The maxel freely supported by a given frame
+fromFrame :: Frame a -> Maxel a
+fromFrame (Frame f) = fromSet f
+
