@@ -6,9 +6,12 @@ import qualified Data.MultiSet as S
 import qualified Data.Pixel as P
 import           Data.Pixel (Pixel(..))
 import           Data.Realm
+import           Data.Set (Set)
 import           Numeric.Natural
 
 newtype Maxel a = Maxel { unMaxel :: S.MultiSet (Pixel a) }
+
+newtype Frame a = Frame { unFrame :: Set (Pixel a) }
 
 instance Show a => Show (Maxel a) where
   show (Maxel s) = "fromList " ++ show (S.elems s)
@@ -57,6 +60,10 @@ pixels (Maxel s) = S.elems s
 scale :: Ord a => Natural -> Maxel a -> Maxel a
 scale = (fold .) . replicate . fromIntegral
 
+-- | A single-pixel maxel
+singleton :: Ord a => a -> a -> Maxel a
+singleton m n = fromList [Pixel m n]
+
 instance Ord a => Realm (Maxel a) where
   (Maxel p) \/ (Maxel q) = Maxel (p `S.maxUnion` q)
   (Maxel p) /\ (Maxel q) = Maxel (p `S.intersection` q)
@@ -77,4 +84,8 @@ Maxel a <.> Maxel b = Maxel $
   S.bind a $ \x ->
   S.bind b $ \y ->
     maybe S.empty S.singleton (x P.*? y)
+
+-- | The support of a maxel is a frame
+support :: Maxel a -> Frame a
+support (Maxel a) = Frame $ S.toSet a
 
