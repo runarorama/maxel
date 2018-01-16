@@ -8,6 +8,7 @@ import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
 import           Data.Maxel
+import           Data.Pixel
 
 genPixel :: Gen (Pixel Int)
 genPixel = do
