@@ -17,9 +17,12 @@ size (Maxel s) = fromIntegral $ S.size s
 
 -- | The extent of a maxel m is the pixel (r,c) where r and c are the largest row
 -- and column of the pixels in m, respectively.
-extent :: Ord a => Maxel a -> Pixel a
-extent (Maxel s) =
-  Pixel (S.findMax $ S.map row s) (S.findMax $ S.map column s)
+-- This operation is undefined for the empty maxel.
+extent :: Ord a => Maxel a -> Maybe (Pixel a)
+extent (Maxel s)
+  | S.null s = Nothing
+  | otherwise = Just $ Pixel (S.findMax $ S.map row s)
+                             (S.findMax $ S.map column s)
 
 -- | A maxel is diagonal exactly when all of its pixels are diagonal.
 isDiagonal :: Eq a => Maxel a -> Bool
@@ -32,4 +35,5 @@ transpose (Maxel s) = Maxel (S.map P.transpose s)
 -- | A maxel is symmetric when its transpose is itself
 isSymmetric :: Ord a => Maxel a -> Bool
 isSymmetric m = transpose m == m
+
 
