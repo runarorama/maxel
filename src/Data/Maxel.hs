@@ -97,3 +97,7 @@ fromSet s = Maxel (S.fromSet s)
 fromFrame :: Frame a -> Maxel a
 fromFrame (Frame f) = fromSet f
 
+-- | The cross of m is all the rows and columns in m
+cross :: Ord a => Maxel a -> Pixel (Set a)
+cross (Maxel m) = Pixel (S.toSet $ S.map row m) (S.toSet $ S.map column m)
+
