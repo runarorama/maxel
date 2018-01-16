@@ -23,3 +23,4 @@ rowCollinear (Pixel r1 _) (Pixel r2 _) = r1 == r2
 
 collinear :: (Eq a) => Pixel a -> Pixel a -> Bool
 collinear = liftA2 (||) <$> columnCollinear <*> rowCollinear
+

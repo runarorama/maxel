@@ -33,6 +33,14 @@ prop_transpose_identity =
     a <- forAll genPixel
     transpose (transpose a) === a
 
+-- For a pixel 'a = (m,n)', 'row a = m' and 'col a = n'
+prop_row_col :: Property
+prop_row_col =
+  property $ do
+    p <- forAll genPixel
+    let Pixel m n = p
+    row p === m
+    column p === n
 
 tests :: IO Bool
 tests = checkParallel $$(discover)
