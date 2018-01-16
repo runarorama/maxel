@@ -35,5 +35,5 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
+    - QuickCheck
     - maxel
-    - hedgehog

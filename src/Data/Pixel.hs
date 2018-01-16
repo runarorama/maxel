@@ -29,3 +29,6 @@ rowCollinear x y = row x == row y
 collinear :: (Eq a) => Pixel a -> Pixel a -> Bool
 collinear = liftA2 (||) <$> columnCollinear <*> rowCollinear
 
+(*?) :: Eq a => Pixel a -> Pixel a -> Maybe (Pixel a)
+Pixel k l *? Pixel m n | l == m = Just (Pixel k m)
+                       | otherwise = Nothing

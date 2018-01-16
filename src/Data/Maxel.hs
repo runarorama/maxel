@@ -1,5 +1,6 @@
 module Data.Maxel where
 
+import           Data.Foldable
 import qualified Data.MultiSet as S
 import qualified Data.Pixel as P
 import           Data.Pixel (Pixel(..))
@@ -52,8 +53,8 @@ pixels :: Maxel a -> [Pixel a]
 pixels (Maxel s) = S.elems s
 
 -- | Scale a maxel by a natural number n, by scaling the multiplicities.
-scale :: Natural -> Maxel a -> Maxel a
-scale n = fold . replicate n
+scale :: Ord a => Natural -> Maxel a -> Maxel a
+scale = (fold .) . replicate . fromIntegral
 
 instance Ord a => Realm (Maxel a) where
   (Maxel p) \/ (Maxel q) = Maxel (p `S.maxUnion` q)
@@ -62,8 +63,8 @@ instance Ord a => Realm (Maxel a) where
 instance Ord a => Ord (Maxel a) where
   m <= n = m \/ n == n
 
-instance Ord a => Eq (Maxel a) where
-  m == n = m <= n && m >= n
+instance Eq a => Eq (Maxel a) where
+  Maxel m == Maxel n = m == n
 
 instance Ord a => Monoid (Maxel a) where
   mappend (Maxel p) (Maxel q) = Maxel (p `S.union` q)
