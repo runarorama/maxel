@@ -32,3 +32,4 @@ transpose (Maxel s) = Maxel (S.map P.transpose s)
 -- | A maxel is symmetric when its transpose is itself
 isSymmetric :: Ord a => Maxel a -> Bool
 isSymmetric m = transpose m == m
+
