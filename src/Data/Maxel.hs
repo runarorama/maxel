@@ -32,8 +32,16 @@ isDiagonal (Maxel s) = all P.isDiagonal $ S.elems s
 transpose :: Ord a => Maxel a -> Maxel a
 transpose (Maxel s) = Maxel (S.map P.transpose s)
 
--- | A maxel is symmetric when its transpose is itself
+-- | A maxel is symmetric when its transpose is itself.
 isSymmetric :: Ord a => Maxel a -> Bool
 isSymmetric m = transpose m == m
+
+-- | The empty maxel has no pixels.
+empty :: Ord a => Maxel a
+empty = fromList []
+
+-- | Test whether a given maxel is the empty maxel.
+null :: Maxel a -> Bool
+null (Maxel s) = S.null s
 
 

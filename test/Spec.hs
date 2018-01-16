@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell  #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Main where
 
@@ -44,6 +45,10 @@ prop_row_col =
     let Pixel m n = p
     P.row p === m
     P.column p === n
+
+-- The empty maxel is empty
+prop_empty_null :: Property
+prop_empty_null = property . assert . M.null $ M.empty @Int
 
 tests :: IO Bool
 tests = checkParallel $$(discover)
