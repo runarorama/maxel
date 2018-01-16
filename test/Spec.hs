@@ -1,13 +1,17 @@
-{-# LANGUAGE TemplateHaskell  #-}
-{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
+import           Data.Bifunctor
+import           Data.Monoid
 import           Control.Monad (void)
 import           Hedgehog
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
+import Data.Realm
 import qualified Data.Maxel as M
 import qualified Data.Pixel as P
 import Data.Maxel (Maxel(..))
@@ -22,6 +26,10 @@ genPixel = do
 genDiagonal :: Gen (Pixel Int)
 genDiagonal =
   P.diagonal <$> Gen.int Range.linearBounded
+
+genMaxel :: Gen (Maxel Int)
+genMaxel =
+  M.fromList <$> Gen.list (Range.linear 0 10) genPixel
 
 -- A pixel 'p' is a diagonal exactly when 'transpose p = p'
 prop_transpose_pixel_diagonal :: Property
@@ -53,6 +61,64 @@ prop_empty_null = property . assert . M.null $ M.empty @Int
 -- The empty maxel has size 0
 prop_empty_zero :: Property
 prop_empty_zero = property . assert . (== 0) . M.size $ M.empty @Int
+
+prop_maxel_commutative :: Property
+prop_maxel_commutative = property $ do
+   m <- forAll genMaxel
+   n <- forAll genMaxel
+   m <> n === n <> m
+   m \/ n === n \/ m
+   m /\ n === n /\ m
+
+-- group_maxel_realm :: Group
+-- group_maxel_realm =
+--   Group "Maxel realm laws" $ map (second property)
+--         [ ("commutative law", do
+--              m <- forAll genMaxel
+--              n <- forAll genMaxel
+--              m <> n === n <> m
+--              m \/ n === n \/ m
+--              m /\ n === n /\ m)
+--         , ("associative law", do
+--              k <- forAll genMaxel
+--              n <- forAll genMaxel
+--              m <- forAll genMaxel
+--              k <> (m <> n) === (k <> m) <> n
+--              k \/ (m \/ n) === (k \/ m) \/ n
+--              k /\ (m /\ n) === (k /\ m) /\ n)
+--         , ("distributive law", do
+--              k <- forAll genMaxel
+--              n <- forAll genMaxel
+--              m <- forAll genMaxel
+--              k <> (m \/ n) === (k <> m) \/ (k <> n)
+--              k <> (m /\ n) === (k <> m) /\ (k <> n)
+--              k /\ (m \/ n) === (k /\ m) \/ (k /\ n)
+--              k \/ (m /\ n) === (k \/ m) /\ (k \/ n))
+--         , ("identity law", do
+--              m <- forAll genMaxel
+--              mempty <> m === m
+--              mempty \/ m === m
+--              mempty /\ m === mempty)
+--         , ("absorption law", do
+--              m <- forAll genMaxel
+--              n <- forAll genMaxel
+--              m \/ (m /\ n) === m
+--              m /\ (m \/ n) === m)
+--         , ("idempotent law", do
+--              m <- forAll genMaxel
+--              m /\ m === m
+--              m \/ m === m)
+--         , ("summation law", do
+--              m <- forAll genMaxel
+--              n <- forAll genMaxel
+--              (m \/ n) <> (m /\ n) === m <> n)
+--         , ("cancellation law", do
+--              k <- forAll genMaxel
+--              n <- forAll genMaxel
+--              m <- forAll genMaxel
+--              (k <> n == m <> n) === (k == m)
+--         )
+--         ]
 
 tests :: IO Bool
 tests = checkParallel $$(discover)
