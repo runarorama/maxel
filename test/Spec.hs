@@ -27,29 +27,30 @@ genDiagonal = P.diagonal <$> arbitrary
 instance (Ord a, Arbitrary a) => Arbitrary (Maxel a) where
   arbitrary = M.fromList <$> listOf arbitrary
 
--- A pixel 'p' is a diagonal exactly when 'transpose p = p'
 prop_transpose_pixel_diagonal :: Property
 prop_transpose_pixel_diagonal =
-  forAll (genDiagonal @Int) $ \a -> P.transpose a === a
+  label "isDiagonal p <=> transpose p = p" .
+    forAll (genDiagonal @Int) $ \a -> P.transpose a === a
 
--- transpose . transpose = id
 prop_transpose_pixel_identity :: Property
 prop_transpose_pixel_identity =
-  forAll (arbitrary @(Pixel Int)) $ \a -> P.transpose (P.transpose a) === a
+  label "transpose . transpose = id" .
+    forAll (arbitrary @(Pixel Int)) $ \a -> P.transpose (P.transpose a) === a
 
--- For a pixel 'a = (m,n)', 'row a = m' and 'col a = n'
 prop_row_col :: Property
 prop_row_col =
-  forAll (arbitrary @(Pixel Int)) $ \p ->
-    let Pixel m n = p in P.row p === m .&&. P.column p === n
+  label "(row (m, n), col (m, n)) = (m, n)" .
+    forAll (arbitrary @(Pixel Int)) $ \p ->
+      let Pixel m n = p in P.row p === m .&&. P.column p === n
 
--- The empty maxel is empty
 prop_empty_null :: Property
-prop_empty_null = property $ M.null @Int M.empty
+prop_empty_null = label "The empty maxel is empty" .
+  property $ M.null @Int M.empty
 
--- The empty maxel has size 0
 prop_empty_zero :: Property
-prop_empty_zero = property . (== 0) . M.size $ M.empty @Int
+prop_empty_zero =
+  label "The empty maxel has size 0" .
+    property . (== 0) . M.size $ M.empty @Int
 
 prop_maxel_realm :: Property
 prop_maxel_realm =
@@ -80,6 +81,12 @@ prop_maxel_realm =
       ((m \/ n) <> (m /\ n) === m <> n) .&&.
     label "cancellation law"
       ((k <> n == m <> n) === (k == m))
+
+prop_pixel_mul_transpose :: Property
+prop_pixel_mul_transpose =
+  label "transpose (a *? b) == (*?) <$> transpose a <*> transpose b" .
+    forAll (arbitrary @(Pixel Int, Pixel Int)) $ \(a, b) ->
+      (P.transpose <$> a P.*? b) == P.transpose b P.*? P.transpose a
 
 return []
 

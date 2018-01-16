@@ -29,6 +29,10 @@ rowCollinear x y = row x == row y
 collinear :: (Eq a) => Pixel a -> Pixel a -> Bool
 collinear = liftA2 (||) <$> columnCollinear <*> rowCollinear
 
+-- | Pixels form a category in that
+-- (k,l) *? (m,n) is defined only when l == m.
+-- The diagonal is an identity for this operation.
 (*?) :: Eq a => Pixel a -> Pixel a -> Maybe (Pixel a)
-Pixel k l *? Pixel m n | l == m = Just (Pixel k m)
+Pixel k l *? Pixel m n | l == m = Just (Pixel k n)
                        | otherwise = Nothing
+
