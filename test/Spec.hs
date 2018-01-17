@@ -15,7 +15,7 @@ import           Test.QuickCheck
 import Data.Realm
 import qualified Data.Maxel as M
 import qualified Data.Pixel as P
-import Data.Maxel (Maxel(..))
+import Data.Maxel (Maxel(..), Frame(..))
 import Data.Pixel (Pixel(..))
 
 instance Arbitrary a => Arbitrary (Pixel a) where
@@ -29,6 +29,10 @@ genDiagonal = P.diagonal <$> arbitrary
 
 instance (Ord a, Arbitrary a) => Arbitrary (Maxel a) where
   arbitrary = M.fromList <$> listOf arbitrary
+
+-- | Generate a maxel whose support is in the frame f
+genFromFrame :: Ord a => Frame a -> Gen (Maxel a)
+genFromFrame f = M.fromList <$> (listOf . elements . Set.toList $ unFrame f)
 
 prop_transpose_pixel_diagonal :: Property
 prop_transpose_pixel_diagonal =
@@ -83,7 +87,7 @@ prop_maxel_realm =
     label "summation law"
       ((m \/ n) <> (m /\ n) === m <> n) .&&.
     label "cancellation law"
-      ((k <> n == m <> n) === (k == m))
+      (property ((k <> n /= m <> n) || k == m))
 
 prop_pixel_mul_transpose :: Property
 prop_pixel_mul_transpose =
@@ -126,13 +130,29 @@ prop_partial_identity_interscect =
       in
         x M.<.> y === M.partialIdentity (Set.intersection j j')
 
+cartesianFrame :: Ord a => Set a -> Frame a
+cartesianFrame j = M.Frame . Set.fromList . join (liftA2 Pixel) $ Set.elems j
+
 prop_partial_identity_support :: Property
 prop_partial_identity_support =
-  label "partial identity on a maxel's support is identity" .
+  label "partial identity on a maxel supported by its frame is identity" .
     forAll (arbitrary @(Set Int, Maxel Int)) $ \(j, m) ->
       let ej = M.partialIdentity j
       in (ej M.<.> m == m && m M.<.> ej == m) ===
-         (M.support m <= (M.Frame . Set.fromList . join (liftA2 Pixel) $ Set.elems j))
+         (M.support m <= cartesianFrame j)
+
+prop_support_product_closure :: Property
+prop_support_product_closure =
+  label "maxel product is closed under frames" $
+    forAll (arbitrary @(Set Int)) $ \j ->
+      let f = cartesianFrame j
+      in forAll (if Set.null j then return (M.empty, M.empty)
+                 else do
+                   let f = cartesianFrame j
+                   m <- genFromFrame f
+                   n <- genFromFrame f
+                   return (m,n)) $ \(m, n) ->
+                M.support (m M.<.> n) <= f
 
 return []
 
@@ -141,3 +161,4 @@ tests = $quickCheckAll
 
 main :: IO ()
 main = void tests
+
