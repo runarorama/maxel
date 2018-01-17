@@ -7,7 +7,9 @@ module Main where
 import           Data.Bifunctor
 import           Data.Monoid
 import           Data.Set (Set)
-import           Control.Monad (void)
+import qualified Data.Set as Set
+import           Control.Applicative
+import           Control.Monad (void, join)
 import           Test.QuickCheck
 
 import Data.Realm
@@ -111,9 +113,26 @@ prop_diagonal_idempotent =
 prop_partial_identity_idempotent :: Property
 prop_partial_identity_idempotent =
   label "partial identities are idempotent" .
-    forAll (arbitrary @(Set Int)) $ \ns ->
-      let x = M.partialIdentity ns in
+    forAll (arbitrary @(Set Int)) $ \j ->
+      let x = M.partialIdentity j in
         x M.<.> x === x
+
+prop_partial_identity_interscect :: Property
+prop_partial_identity_interscect =
+  label "partial identity multiplication is set intersection" .
+    forAll (arbitrary @(Set Int, Set Int)) $ \(j, j') ->
+      let x = M.partialIdentity j
+          y = M.partialIdentity j'
+      in
+        x M.<.> y === M.partialIdentity (Set.intersection j j')
+
+prop_partial_identity_support :: Property
+prop_partial_identity_support =
+  label "partial identity on a maxel's support is identity" .
+    forAll (arbitrary @(Set Int, Maxel Int)) $ \(j, m) ->
+      let ej = M.partialIdentity j
+      in (ej M.<.> m == m && m M.<.> ej == m) ===
+         (M.support m <= (M.Frame . Set.fromList . join (liftA2 Pixel) $ Set.elems j))
 
 return []
 

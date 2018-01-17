@@ -13,7 +13,7 @@ import           Numeric.Natural
 
 newtype Maxel a = Maxel { unMaxel :: S.MultiSet (Pixel a) }
 
-newtype Frame a = Frame { unFrame :: Set (Pixel a) }
+newtype Frame a = Frame { unFrame :: Set (Pixel a) } deriving (Show)
 
 instance Show a => Show (Maxel a) where
   show (Maxel s) = "fromList " ++ show (S.elems s)
@@ -75,6 +75,12 @@ instance Ord a => Ord (Maxel a) where
 
 instance Eq a => Eq (Maxel a) where
   Maxel m == Maxel n = m == n
+
+instance Ord a => Ord (Frame a) where
+  Frame m <= Frame n = m `Set.isSubsetOf` n
+
+instance Eq a => Eq (Frame a) where
+  Frame m == Frame n = m == n
 
 instance Ord a => Monoid (Maxel a) where
   mappend (Maxel p) (Maxel q) = Maxel (p `S.union` q)
