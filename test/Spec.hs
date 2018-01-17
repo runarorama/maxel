@@ -6,6 +6,7 @@ module Main where
 
 import           Data.Bifunctor
 import           Data.Monoid
+import           Data.Set (Set)
 import           Control.Monad (void)
 import           Test.QuickCheck
 
@@ -104,7 +105,15 @@ prop_diagonal_idempotent :: Property
 prop_diagonal_idempotent =
   label "singleton diagonals are idempotent" .
     forAll (arbitrary @Int) $ \n ->
-      M.singleIdempotent n M.<.> M.singleIdempotent n === M.singleIdempotent n
+      let x = M.singleIdempotent n in
+        x M.<.> x === x
+
+prop_partial_identity_idempotent :: Property
+prop_partial_identity_idempotent =
+  label "partial identities are idempotent" .
+    forAll (arbitrary @(Set Int)) $ \ns ->
+      let x = M.partialIdentity ns in
+        x M.<.> x === x
 
 return []
 

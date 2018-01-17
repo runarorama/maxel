@@ -107,7 +107,8 @@ cross (Maxel m) = Pixel (S.toSet $ S.map row m) (S.toSet $ S.map column m)
 singleIdempotent :: Ord a => a -> Maxel a
 singleIdempotent = join singleton
 
--- | A partial identity maxel has one-pixels on the diagonal
+-- | A partial identity maxel has diagonal singletons on the diagonal
+-- and is an idempotent
 partialIdentity :: Ord a => Set a -> Maxel a
 partialIdentity s = Maxel . S.fromSet $ P.diagonal `Set.map` s
 
